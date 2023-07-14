@@ -1,0 +1,28 @@
+int rowCount = 0;
+for (Row row : firstSheet) {
+    Row newRow = secondSheet.createRow(rowCount);
+    int cellCount = 0;
+    for (String columnName : columnsToCopy) {
+        int colIndex = getColumnIndex(firstSheet, columnName);
+        if (colIndex != -1) {
+            Cell cell = row.getCell(colIndex, MissingCellPolicy.RETURN_BLANK_AS_NULL);
+            if (cell != null) {
+                Cell newCell = newRow.createCell(cellCount);
+                newCell.setCellValue(cell.getStringCellValue()); // Assuming the cells contain string values
+            }
+        }
+        cellCount++;
+    }
+    rowCount++;
+}
+
+
+private static int getColumnIndex(Sheet sheet, String columnName) {
+    Row firstRow = sheet.getRow(0); // Assuming column names are in the first row
+    for (Cell cell : firstRow) {
+        if (columnName.equals(cell.getStringCellValue())) {
+            return cell.getColumnIndex();
+        }
+    }
+    return -1; // Column name not found
+}
