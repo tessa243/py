@@ -1,3 +1,51 @@
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class ExcelFilterExample {
+    public static void main(String[] args) throws IOException {
+        String excelFilePath = "path/to/your/excel/file.xlsx";
+
+        // Open the Excel workbook
+        FileInputStream fis = new FileInputStream(excelFilePath);
+        Workbook workbook = new XSSFWorkbook(fis);
+
+        // Access the first sheet in the workbook
+        Sheet sheet = workbook.getSheetAt(0);
+
+        // Get the column indexes (0-based)
+        int shortDescColumnIndex = 3;
+        int categoryColumnIndex = 4;
+
+        // Apply the filter to the "Short Description" column
+        String filterValue = "job failure";
+        AutoFilter filter = sheet.setAutoFilter(new CellRangeAddress(0, sheet.getLastRowNum(), shortDescColumnIndex, shortDescColumnIndex));
+
+        // Iterate over the rows and update values in the "E" column
+        for (Row row : sheet) {
+            Cell shortDescCell = row.getCell(shortDescColumnIndex);
+
+            if (shortDescCell != null && shortDescCell.getStringCellValue().equalsIgnoreCase(filterValue)) {
+                Cell categoryCell = row.createCell(categoryColumnIndex);
+                categoryCell.setCellValue("Job Failure");
+            }
+        }
+
+        // Save the modified workbook
+        FileOutputStream fos = new FileOutputStream(excelFilePath);
+        workbook.write(fos);
+
+        // Close the resources
+        workbook.close();
+        fis.close();
+        fos.close();
+    }
+}
+
+
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.write.metadata.style.WriteCellStyle;
