@@ -1,3 +1,64 @@
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.write.metadata.style.WriteCellStyle;
+import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ExcelFilterExample {
+    public static void main(String[] args) {
+        String excelFilePath = "path/to/your/excel/file.xlsx";
+
+        // Read the Excel file
+        List<ExcelData> excelDataList = EasyExcel.read(excelFilePath)
+                .head(ExcelData.class)
+                .sheet()
+                .doReadSync();
+
+        // Apply the filter and update values
+        String filterValue = "job failure";
+        for (ExcelData data : excelDataList) {
+            if (data.getShortDescription().equalsIgnoreCase(filterValue)) {
+                data.setCategory("Job Failure");
+            }
+        }
+
+        // Write the modified data back to the Excel file
+        EasyExcel.write(excelFilePath, ExcelData.class)
+                .sheet()
+                .doWrite(excelDataList);
+    }
+
+    public static class ExcelData {
+        @ExcelProperty(index = 0)
+        private String shortDescription;
+
+        @ExcelProperty(index = 1)
+        private String category;
+
+        // Getters and setters
+
+        public String getShortDescription() {
+            return shortDescription;
+        }
+
+        public void setShortDescription(String shortDescription) {
+            this.shortDescription = shortDescription;
+        }
+
+        public String getCategory() {
+            return category;
+        }
+
+        public void setCategory(String category) {
+            this.category = category;
+        }
+    }
+}
+
+
+
 int rowCount = 0;
 for (Row row : firstSheet) {
     Row newRow = secondSheet.createRow(rowCount);
