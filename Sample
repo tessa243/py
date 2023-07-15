@@ -26,3 +26,49 @@ private static int getColumnIndex(Sheet sheet, String columnName) {
     }
     return -1; // Column name not found
 }
+import org.apache.poi.ss.usermodel.*;
+
+import java.io.*;
+
+public class ExcelFilterExample {
+
+    public static void main(String[] args) {
+        try {
+            // Load the Excel workbook
+            Workbook workbook = WorkbookFactory.create(new File("path/to/your/workbook.xlsx"));
+
+            // Get the sheet
+            Sheet sheet = workbook.getSheet("Sheet1"); // Replace "Sheet1" with your sheet name
+
+            // Rename column E as "Category"
+            Row headerRow = sheet.getRow(0);
+            Cell categoryCell = headerRow.createCell(4);
+            categoryCell.setCellValue("Category");
+
+            // Apply text filter on column D (Short Description) and fill Category column (column E)
+            AutoFilter filter = sheet.getAutoFilter();
+            filter.setColumnFilterCriteria(3, FilterOperator.EQUAL, "failure"); // 3 represents column D (index starts from 0)
+
+            int lastRowNum = sheet.getLastRowNum();
+            for (int rowNum = 1; rowNum <= lastRowNum; rowNum++) {
+                Row row = sheet.getRow(rowNum);
+                Cell descriptionCell = row.getCell(3); // Cell in column D
+                String descriptionValue = descriptionCell.getStringCellValue();
+                if (descriptionValue.equalsIgnoreCase("failure")) {
+                    Cell categoryCellForRow = row.createCell(4); // Cell in column E
+                    categoryCellForRow.setCellValue("failure");
+                }
+            }
+
+            // Save the workbook
+            FileOutputStream fileOut = new FileOutputStream("path/to/your/filtered_workbook.xlsx");
+            workbook.write(fileOut);
+            fileOut.close();
+
+            System.out.println("Filter applied successfully!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
