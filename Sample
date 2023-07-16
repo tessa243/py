@@ -1,3 +1,49 @@
+// Create the Pivot Table
+        int firstDataRowIndex = startRow + 1;
+        int lastDataRowIndex = endRow;
+        int firstDataColumnIndex = startColumn;
+        int lastDataColumnIndex = endColumn;
+
+        int pivotTableStartRow = 0;
+        int pivotTableStartColumn = 0;
+        int pivotTableEndRow = 2; // Adjust this based on the desired layout of the Pivot Table
+        int pivotTableEndColumn = 2; // Adjust this based on the desired layout of the Pivot Table
+
+        // Create the Pivot Table
+        PivotTable pivotTable = pivotSheet.createPivotTable(
+                new CellReference(pivotTableStartRow, pivotTableStartColumn),
+                new AreaReference(
+                        firstDataRowIndex, firstDataColumnIndex, lastDataRowIndex, lastDataColumnIndex,
+                        workbook.getSpreadsheetVersion()
+                ),
+                sheet
+        );
+
+        // Set the Pivot Table field configurations
+        pivotTable.addRowLabel(categoryColumnIndex);
+        pivotTable.addColumnLabel(DataConsolidateFunction.COUNT, shortDescColumnIndex);
+        pivotTable.getCTPivotTableDefinition().getPivotFields().getPivotFieldArray(0).setAxis(STAxis.AXIS_COL);
+        pivotTable.getCTPivotTableDefinition().getPivotFields().getPivotFieldArray(0).addNewItems();
+        pivotTable.getCTPivotTableDefinition().getPivotFields().getPivotFieldArray(0).getItems().addNewItem().setT(STItemType.DEFAULT);
+
+        // Save the modified workbook
+        FileOutputStream fos = new FileOutputStream(excelFilePath);
+        workbook.write(fos);
+
+        // Close the resources
+        workbook.close();
+        fis.close();
+        fos.close();
+    }
+}
+
+
+
+
+
+
+
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
