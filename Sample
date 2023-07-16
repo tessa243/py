@@ -1,3 +1,25 @@
+// Create a pivot table
+        int lastRowIndex = sheet.getLastRowNum();
+        int lastColumnIndex = sheet.getRow(0).getLastCellNum() - 1;
+        CellRangeAddress sourceData = new CellRangeAddress(0, lastRowIndex, 0, lastColumnIndex);
+        String pivotTableName = "PivotTable";
+        String pivotTableLocation = "F1"; // Change the location as per your preference
+
+        Sheet pivotSheet = workbook.createSheet("Pivot");
+        CellReference pivotTableReference = new CellReference(pivotSheet.getSheetName(), pivotTableLocation);
+        XSSFPivotTable pivotTable = ((XSSFSheet) pivotSheet).createPivotTable(sourceData, pivotTableReference, sheet);
+
+        // Set the pivot table fields
+        pivotTable.addRowLabel(categoryColumnIndex);
+        pivotTable.addColumnLabel(DataConsolidateFunction.COUNT, categoryColumnIndex);
+        pivotTable.getCTPivotTableDefinition().getPivotFields().getPivotFieldArray(categoryColumnIndex).setOutline(false);
+
+        // Additional pivot table fields
+        // Example: Add "Short Description" as a column label
+        int shortDescColumnLabelIndex = 3;
+        pivotTable.addColumnLabel(DataConsolidateFunction.COUNT, shortDescColumnLabelIndex);
+
+
 
 // Create a Pivot Table
         int startRow = 0;
