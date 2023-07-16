@@ -1,4 +1,27 @@
 // Create a pivot table
+Sheet pivotSheet = workbook.createSheet("Pivot");
+CellReference pivotTableReference = new CellReference(0, 0);
+XSSFPivotTable pivotTable = ((XSSFSheet) pivotSheet).createPivotTable(
+    new AreaReference("Sheet1!A1:E" + (sheet.getLastRowNum() + 1), SpreadsheetVersion.EXCEL2007),
+    pivotTableReference, sheet
+);
+
+// Set the pivot table fields
+pivotTable.addRowLabel(categoryColumnIndex);
+
+// Save the modified workbook
+FileOutputStream fos = new FileOutputStream(excelFilePath);
+workbook.write(fos);
+
+// Close the resources
+workbook.close();
+fis.close();
+fos.close();
+
+
+
+
+// Create a pivot table
         int lastRowIndex = sheet.getLastRowNum();
         int lastColumnIndex = sheet.getRow(0).getLastCellNum() - 1;
         CellRangeAddress sourceData = new CellRangeAddress(0, lastRowIndex, 0, lastColumnIndex);
