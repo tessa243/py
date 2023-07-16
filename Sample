@@ -1,3 +1,38 @@
+
+// Create a Pivot Table
+        int startRow = 0;
+        int startColumn = 0;
+        int endRow = sheet.getLastRowNum();
+        int endColumn = 4; // Adjust this based on the number of columns in your data
+
+        // Create a new sheet for the Pivot Table
+        Sheet pivotSheet = workbook.createSheet("Pivot Table");
+
+        // Copy the data to the Pivot Table sheet
+        for (int r = startRow; r <= endRow; r++) {
+            Row sourceRow = sheet.getRow(r);
+            Row targetRow = pivotSheet.createRow(r);
+
+            for (int c = startColumn; c <= endColumn; c++) {
+                Cell sourceCell = sourceRow.getCell(c);
+                Cell targetCell = targetRow.createCell(c);
+
+                if (sourceCell != null) {
+                    CellType cellType = sourceCell.getCellType();
+                    targetCell.setCellType(cellType);
+
+                    switch (cellType) {
+                        case STRING:
+                            targetCell.setCellValue(sourceCell.getStringCellValue());
+                            break;
+                        case NUMERIC:
+                            targetCell.setCellValue(sourceCell.getNumericCellValue());
+                            break;
+                        // Add more cases as needed for different cell types
+                    }
+                }
+            }
+        }
 // Create the Pivot Table
         int firstDataRowIndex = startRow + 1;
         int lastDataRowIndex = endRow;
