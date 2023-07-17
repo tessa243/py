@@ -1,3 +1,16 @@
+int categoryDataFieldIndex = pivotTable.getDataFields().size();
+        CTDataField categoryDataField = pivotTable.getCTPivotTableDefinition().addNewDataField();
+        categoryDataField.setName("Category");
+        categoryDataField.setShowDataAs(STDataConsolidateFunction.COUNT);
+        categoryDataField.setBaseField(categoryColumnIndex);
+        categoryDataField.setBaseItem(0);
+
+        // Set the value field settings
+        categoryDataField.setNumFmtId(0);
+
+
+
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
