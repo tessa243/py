@@ -1,3 +1,23 @@
+<plugins>
+  <plugin>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+    <version>2.5.3</version>
+    <configuration>
+      <executable>true</executable>
+    </configuration>
+    <executions>
+      <execution>
+        <goals>
+          <goal>repackage</goal>
+        </goals>
+      </execution>
+    </executions>
+  </plugin>
+</plugins>
+
+
+
 // Create a pivot table
 Sheet pivotSheet = workbook.createSheet("Pivot");
 CellReference pivotTableReference = new CellReference(0, 0);
