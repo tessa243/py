@@ -1,3 +1,10 @@
+int categoryFieldIndex = pivotTable.addRowLabel(categoryColumnIndex);
+
+        // Set the aggregation function for the "Category" column to COUNT
+        pivotTable.getCTPivotTableDefinition().getPivotFields().getPivotFieldArray(categoryFieldIndex).setDataField(true);
+        pivotTable.getCTPivotTableDefinition().getPivotFields().getPivotFieldArray(categoryFieldIndex).setFunction(DataConsolidateFunction.COUNT.getFunctionIndex())
+
+
 CTDataField dataField1 = pivotTable.getCTPivotTableDefinition().getDataFields().getDataFieldArray(valueFieldIndex1);
         dataField1.setName("Sum
     // Add the "Category" column as a data field with count function
