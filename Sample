@@ -1,3 +1,114 @@
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class ExcelFilterExample {
+    public static void main(String[] args) throws IOException {
+        String excelFilePath = "path/to/your/excel/file.xlsx";
+
+        // Open the Excel workbook
+        FileInputStream fis = new FileInputStream(excelFilePath);
+        Workbook workbook = new XSSFWorkbook(fis);
+
+        // Access the first sheet in the workbook
+        Sheet sheet = workbook.getSheetAt(0);
+
+        // Get the column indexes (0-based)
+        int shortDescColumnIndex = 3;
+        int categoryColumnIndex = 4;
+        int dateColumnIndex = 5;
+        int firstDataColumnIndex = 6;
+
+        // Regular expressions to match and their corresponding update values
+        List<String> regexPatterns = Arrays.asList(
+                "jobfailure",
+                "jobtermination",
+                "maxretry"
+        );
+        List<String> updateValues = Arrays.asList(
+                "Job Failure",
+                "Job Termination",
+                "Max Retry"
+        );
+        String defaultUpdateValue = "Others";
+
+        // Iterate over the rows and update values in the "E" and "F" columns
+        for (Row row : sheet) {
+            // Existing code to update the "Category" column
+
+            // Add the month column update
+            Cell dateCell = row.getCell(dateColumnIndex);
+            if (dateCell != null && dateCell.getCellType() == CellType.NUMERIC) {
+                Date dateValue = dateCell.getDateCellValue();
+                String monthValue = new SimpleDateFormat("MMMM").format(dateValue);
+
+                int monthColumnIndex = getMonthColumnIndex(sheet, monthValue);
+                if (monthColumnIndex == -1) {
+                    monthColumnIndex = createMonthColumn(sheet, monthValue);
+                }
+
+                Cell monthCell = row.createCell(monthColumnIndex);
+                monthCell.setCellValue(1); // Assuming you want to count occurrences
+            }
+        }
+
+        // Create a pivot table
+        Sheet pivotSheet = workbook.createSheet("Pivot");
+        CellReference pivotTableReference = new CellReference(0, 0);
+        XSSFPivotTable pivotTable = ((XSSFSheet) pivotSheet).createPivotTable(
+                new AreaReference("Sheet1!A1:" + CellReference.convertNumToColString(firstDataColumnIndex - 1) + (sheet.getLastRowNum() + 1)),
+                pivotTableReference, sheet
+        );
+
+        // Set the row label and data columns
+        pivotTable.addRowLabel(categoryColumnIndex);
+
+        for (int i = firstDataColumnIndex; i <= sheet.getRow(0).getLastCellNum(); i++) {
+            CellReference dataColumnReference = new CellReference(0, i);
+            pivotTable.addDataColumn(dataColumnReference, false);
+        }
+
+        // Save the modified workbook
+        FileOutputStream fos = new FileOutputStream(excelFilePath);
+        workbook.write(fos);
+
+        // Close the resources
+        workbook.close();
+        fis.close();
+        fos.close();
+    }
+
+    private static int getMonthColumnIndex(Sheet sheet, String monthValue) {
+        Row headerRow = sheet.getRow(0);
+        for (Cell cell : headerRow) {
+            String cellValue = cell.getStringCellValue();
+            if (cellValue.equalsIgnoreCase(monthValue)) {
+                return cell.getColumnIndex();
+            }
+        }
+        return -1;
+    }
+
+    private static int createMonthColumn(Sheet sheet, String monthValue) {
+        Row headerRow = sheet.getRow(0);
+        int monthColumnIndex = headerRow.getLastCellNum();
+        Cell monthCell = headerRow.createCell(monthColumnIndex);
+        monthCell.setCellValue(monthValue);
+        return monthColumnIndex;
+    }
+}
+
+
+
 <plugins>
   <plugin>
     <groupId>org.springframework.boot</groupId>
