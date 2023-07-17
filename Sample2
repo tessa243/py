@@ -1,3 +1,11 @@
+
+    // Add the "Category" column as a data field with count function
+        int categoryDataFieldIndex = pivotTable.getCTPivotTableDefinition().getPivotFields().getPivotFieldArray(categoryColumnIndex).getDataField();
+        pivotTable.getCTPivotTableDefinition().getPivotFields().getPivotFieldArray(categoryColumnIndex).setFunction(org.openxmlformats.schemas.spreadsheetml.x2006.main.STDataConsolidateFunction.COUNT);
+
+        // Add a value field with count function
+        int valueFieldIndex = pivotTable.addColumnLabel(DataConsolidateFunction.COUNT, categoryColumnIndex);
+        pivotTable.getDataField(valueFieldIndex).setNumFmtId(0);
 int categoryDataFieldIndex = pivotTable.getDataFields().size();
         CTDataField categoryDataField = pivotTable.getCTPivotTableDefinition().addNewDataField();
         categoryDataField.setName("Category");
