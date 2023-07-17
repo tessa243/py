@@ -1,4 +1,5 @@
-
+CTDataField dataField1 = pivotTable.getCTPivotTableDefinition().getDataFields().getDataFieldArray(valueFieldIndex1);
+        dataField1.setName("Sum
     // Add the "Category" column as a data field with count function
         int categoryDataFieldIndex = pivotTable.getCTPivotTableDefinition().getPivotFields().getPivotFieldArray(categoryColumnIndex).getDataField();
         pivotTable.getCTPivotTableDefinition().getPivotFields().getPivotFieldArray(categoryColumnIndex).setFunction(org.openxmlformats.schemas.spreadsheetml.x2006.main.STDataConsolidateFunction.COUNT);
