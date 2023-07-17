@@ -1,3 +1,5 @@
+dataField.setFunctionId(STDataConsolidateFunction.Enum.forInt(STDataConsolidateFunction.INT_COUNT))
+
 int categoryFieldIndex = pivotTable.addRowLabel(categoryColumnIndex);
 
         // Set the aggregation function for the "Category" column to COUNT
