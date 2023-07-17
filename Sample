@@ -4,6 +4,87 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class ExcelFilterExample {
+    public static void main(String[] args) throws IOException {
+        String excelFilePath = "path/to/your/excel/file.xlsx";
+
+        // Open the Excel workbook
+        FileInputStream fis = new FileInputStream(excelFilePath);
+        Workbook workbook = new XSSFWorkbook(fis);
+
+        // Access the first sheet in the workbook
+        Sheet sheet = workbook.getSheetAt(0);
+
+        // Get the column indexes (0-based)
+        int categoryColumnIndex = 4;
+
+        // Regular expressions to match and their corresponding update values
+        List<String> regexPatterns = Arrays.asList(
+                "jobfailure",
+                "jobtermination",
+                "maxretry"
+        );
+
+        // Iterate over the rows and update values in the "E" column
+        for (Row row : sheet) {
+            Cell categoryCell = row.getCell(categoryColumnIndex);
+            if (categoryCell != null) {
+                String categoryValue = categoryCell.getStringCellValue().toLowerCase();
+                int count = getCountForCategory(regexPatterns, categoryValue);
+                Cell countCell = row.createCell(categoryColumnIndex + 1);
+                countCell.setCellValue(count);
+            }
+        }
+
+        // Create a pivot table
+        Sheet pivotSheet = workbook.createSheet("Pivot");
+        CellReference pivotTableReference = new CellReference(0, 0);
+        XSSFPivotTable pivotTable = ((XSSFSheet) pivotSheet).createPivotTable(
+                new AreaReference("Sheet1!A1:B" + sheet.getLastRowNum(), SpreadsheetVersion.EXCEL2007),
+                pivotTableReference, sheet
+        );
+
+        // Set the pivot table fields
+        pivotTable.addRowLabel(categoryColumnIndex);
+        pivotTable.addColLabel(categoryColumnIndex + 1, "Count");
+
+        // Save the modified workbook
+        FileOutputStream fos = new FileOutputStream(excelFilePath);
+        workbook.write(fos);
+
+        // Close the resources
+        workbook.close();
+        fis.close();
+        fos.close();
+    }
+
+    private static int getCountForCategory(List<String> regexPatterns, String categoryValue) {
+        int count = 0;
+        for (String regexPattern : regexPatterns) {
+            Pattern pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(categoryValue);
+            if (matcher.find()) {
+                count++;
+            }
+        }
+        return count;
+    }
+}
+
+
+
+
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
