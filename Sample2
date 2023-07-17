@@ -8,6 +8,62 @@ import java.io.IOException;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFPivotTable;
+
+public class ExcelFilterExample {
+    public static void main(String[] args) throws IOException {
+        String excelFilePath = "path/to/your/excel/file.xlsx";
+
+        // Open the Excel workbook
+        FileInputStream fis = new FileInputStream(excelFilePath);
+        Workbook workbook = new XSSFWorkbook(fis);
+
+        // Access the first sheet in the workbook
+        Sheet sheet = workbook.getSheetAt(0);
+
+        // Create a pivot table
+        int lastRowIndex = sheet.getLastRowNum();
+        int lastColumnIndex = sheet.getRow(0).getLastCellNum() - 1;
+        String sourceDataRef = sheet.getSheetName() + "!$A$1:$E$" + (lastRowIndex + 1);
+
+        Sheet pivotSheet = workbook.createSheet("Pivot");
+        XSSFPivotTable pivotTable = ((XSSFSheet) pivotSheet).createPivotTable(new AreaReference(sourceDataRef), new CellReference("A1"), sheet);
+
+        // Set the pivot table fields
+        int categoryColumnIndex = 4; // Modify as per your actual column index
+
+        // Add the "Category" column as row label
+        int categoryFieldIndex = pivotTable.addRowLabel(categoryColumnIndex);
+
+        // Set the aggregation function for the "Category" column using formulas
+        String countFormula = "COUNTIF(" + sheet.getSheetName() + "!$E$2:$E$" + (lastRowIndex + 1) + ", " + sheet.getSheetName() + "!$E2)";
+        CellReference countCellReference = new CellReference(pivotSheet.getSheetName(), 1, categoryFieldIndex, false, false);
+        Cell countCell = pivotSheet.getRow(countCellReference.getRow()).getCell(countCellReference.getCol());
+        countCell.setCellFormula(countFormula);
+
+        // Save the modified workbook
+        FileOutputStream fos = new FileOutputStream(excelFilePath);
+        workbook.write(fos);
+
+        // Close the resources
+        workbook.close();
+        fis.close();
+        fos.close();
+    }
+}
+
+
+
+
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.apache.poi.ss.util.AreaReference;
+import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.xssf.usermodel.XSSFPivotTable;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STDataConsolidateFunction;
 
 public class ExcelFilterExample {
