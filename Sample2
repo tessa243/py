@@ -1,3 +1,89 @@
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+public class CSVToXLSXConverter {
+
+    // ... (existing code)
+
+    public static void writeXLSXFile(String xlsxFilePath, List<String[]> data) {
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Sheet1");
+            int rowCount = 0;
+
+            // Get the first row to determine the column types
+            String[] firstRowData = data.get(0);
+            boolean[] isDateColumn = new boolean[firstRowData.length];
+
+            // Determine which columns are of date type
+            for (int i = 0; i < firstRowData.length; i++) {
+                isDateColumn[i] = isDate(firstRowData[i]);
+            }
+
+            CreationHelper createHelper = workbook.getCreationHelper();
+
+            for (String[] rowData : data) {
+                Row row = sheet.createRow(rowCount++);
+                int columnCount = 0;
+                for (String cellData : rowData) {
+                    Cell cell = row.createCell(columnCount++);
+
+                    // If the column is of date type, set the cell format accordingly
+                    if (isDateColumn[columnCount - 1]) {
+                        CellStyle dateCellStyle = workbook.createCellStyle();
+                        dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd")); // Adjust the format as per your date format in the CSV
+                        cell.setCellValue(parseDate(cellData));
+                        cell.setCellStyle(dateCellStyle);
+                    } else {
+                        cell.setCellValue(cellData);
+                    }
+                }
+            }
+
+            try (FileOutputStream outputStream = new FileOutputStream(xlsxFilePath)) {
+                workbook.write(outputStream);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Helper method to check if a string represents a date
+    private static boolean isDate(String strDate) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Adjust the format as per your date format in the CSV
+        try {
+            dateFormat.parse(strDate);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // Helper method to parse a string date into a Date object
+    private static Date parseDate(String strDate) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Adjust the format as per your date format in the CSV
+        try {
+            return dateFormat.parse(strDate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+}
+
+
+
+
+
+
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
