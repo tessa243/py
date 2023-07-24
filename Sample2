@@ -1,3 +1,62 @@
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class CsvToXlsxConverter {
+    public static void main(String[] args) {
+        String csvFilePath = "path/to/input.csv";
+        String xlsxFilePath = "path/to/output.xlsx";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("Sheet1");
+            String line;
+
+            // Set the custom date format for the cells
+            DataFormat dataFormat = workbook.createDataFormat();
+            short dateFormat = dataFormat.getFormat("m/d/yyyy h:mm");
+            CellStyle dateCellStyle = workbook.createCellStyle();
+            dateCellStyle.setDataFormat(dateFormat);
+
+            int rowNum = 0;
+            while ((line = br.readLine()) != null) {
+                Row row = sheet.createRow(rowNum);
+                String[] values = line.split(",");
+
+                for (int i = 0; i < values.length; i++) {
+                    Cell cell = row.createCell(i);
+
+                    // Check if the value is a date in the custom format
+                    String value = values[i];
+                    try {
+                        Date date = new SimpleDateFormat("M/d/yyyy h:mm").parse(value);
+                        cell.setCellValue(date);
+                        cell.setCellStyle(dateCellStyle); // Apply the custom date format
+                    } catch (ParseException e) {
+                        cell.setCellValue(value);
+                    }
+                }
+
+                rowNum++;
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(xlsxFilePath)) {
+                workbook.write(fos);
+            }
+
+            System.out.println("Conversion complete.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+
 import io.cucumber.core.cli.Main;
 
 public class CucumberRunner {
