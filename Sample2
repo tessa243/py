@@ -1,3 +1,49 @@
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class ExcelDateFormatter {
+    public static void main(String[] args) {
+        String inputFilePath = "path_to_your_input_excel.xlsx";
+        String outputFilePath = "path_to_your_output_excel.xlsx";
+
+        try (FileInputStream fis = new FileInputStream(inputFilePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            // Assuming you have data in the first sheet (index 0)
+            Sheet sheet = workbook.getSheetAt(0);
+
+            // Get the date format you want
+            DataFormat dataFormat = workbook.createDataFormat();
+            short customDateFormat = dataFormat.getFormat("m/d/yyyy h:mm");
+
+            // Iterate through the rows and format the cells in the B column
+            for (Row row : sheet) {
+                Cell cell = row.getCell(1); // Assuming B column is index 1 (Column B)
+                if (cell != null && cell.getCellType() == CellType.NUMERIC) {
+                    CellStyle style = cell.getCellStyle();
+                    style.setDataFormat(customDateFormat);
+                    cell.setCellStyle(style);
+                }
+            }
+
+            // Write the modified data to the output Excel file
+            try (FileOutputStream fos = new FileOutputStream(outputFilePath)) {
+                workbook.write(fos);
+            }
+
+            System.out.println("Formatting completed successfully!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
