@@ -1,3 +1,92 @@
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileReader;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class CsvToExcelConverter {
+
+    public static void main(String[] args) throws IOException {
+        // Path to your input CSV file
+        String inputCsvFilePath = "path/to/your/input-csvfile.csv";
+
+        // Path to your output Excel file
+        String outputExcelFilePath = "path/to/your/output-excelfile.xlsx";
+
+        // Load CSV data
+        CSVParser csvParser = new CSVParser(new FileReader(inputCsvFilePath), CSVFormat.DEFAULT);
+
+        // Create a new workbook
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Sheet1");
+
+        // Define date format
+        CellStyle dateCellStyle = workbook.createCellStyle();
+        dateCellStyle.setDataFormat(workbook.createDataFormat().getFormat("m/d/yyyy h:mm"));
+
+        // Regular expression pattern for date format "M/d/yyyy h:mm"
+        String datePattern = "\\d{1,2}/\\d{1,2}/\\d{4} \\d{1,2}:\\d{2}";
+
+        // Read and convert data from CSV to Excel
+        int rowNum = 0;
+        for (CSVRecord record : csvParser) {
+            Row row = sheet.createRow(rowNum++);
+            int colNum = 0;
+            for (String cellValue : record) {
+                Cell cell = row.createCell(colNum++);
+                if (isDateValue(cellValue, datePattern)) {
+                    try {
+                        LocalDateTime dateTime = parseDateTime(cellValue); // You need to implement your own date parsing logic here
+                        cell.setCellValue(dateTime.toString());
+                        cell.setCellStyle(dateCellStyle);
+                    } catch (Exception e) {
+                        // Handle parsing errors
+                        e.printStackTrace();
+                        cell.setCellValue(cellValue); // Write as plain text if parsing fails
+                    }
+                } else {
+                    cell.setCellValue(cellValue);
+                }
+            }
+        }
+
+        // Close the CSV parser
+        csvParser.close();
+
+        // Write the data to the Excel file
+        try (FileOutputStream outputStream = new FileOutputStream(outputExcelFilePath)) {
+            workbook.write(outputStream);
+        }
+
+        // Close the workbook
+        workbook.close();
+    }
+
+    private static boolean isDateValue(String value, String datePattern) {
+        // Use a regular expression to check if the value matches the date pattern
+        Pattern pattern = Pattern.compile(datePattern);
+        Matcher matcher = pattern.matcher(value);
+        return matcher.matches();
+    }
+
+    private static LocalDateTime parseDateTime(String value) {
+        // You need to implement your own date parsing logic based on the format of the date in the CSV
+        // For example, if the date format is "M/d/yyyy h:mm", you can use DateTimeFormatter to parse it
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy h:mm");
+        return LocalDateTime.parse(value, formatter);
+    }
+}
+
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
