@@ -1,3 +1,79 @@
+
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class CsvToXlsxConverter {
+
+    public static void main(String[] args) throws IOException, ParseException {
+        String csvFilePath = "path/to/input.csv";
+        String xlsxFilePath = "path/to/output.xlsx";
+
+        CSVParser csvParser = new CSVParser(new FileReader(csvFilePath), CSVFormat.DEFAULT.withFirstRecordAsHeader());
+        List<CSVRecord> records = csvParser.getRecords();
+        csvParser.close();
+
+        // Create a new workbook and sheet
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        org.apache.poi.ss.usermodel.Sheet sheet = workbook.createSheet("Sheet1");
+
+        // Date format for column K (with time)
+        SimpleDateFormat customSdf = new SimpleDateFormat("M/d/yyyy H:mm");
+
+        int rowNumber = 0;
+        for (CSVRecord record : records) {
+            Row row = sheet.createRow(rowNumber++);
+            int cellNumber = 0;
+            for (String value : record) {
+                // Check if the value is in column K and has a custom date format
+                if (cellNumber == 10 && value.equalsIgnoreCase("opened")) {
+                    // For "opened" status, treat it as a regular string
+                    Cell cell = row.createCell(cellNumber++);
+                    cell.setCellValue(value);
+                } else {
+                    // Check if the value in column K (and other date columns if any) matches the date format "m/d/yyyy H:mm"
+                    try {
+                        Date date = (cellNumber == 10) ? customSdf.parse(value) : null;
+                        if (date != null) {
+                            Cell cell = row.createCell(cellNumber++);
+                            cell.setCellValue(date);
+                            cell.setCellType(CellType.NUMERIC); // Set cell type to numeric (Excel date value)
+                        } else {
+                            // For other columns, treat the values as strings
+                            Cell cell = row.createCell(cellNumber++);
+                            cell.setCellValue(value);
+                        }
+                    } catch (ParseException e) {
+                        // If it's not a date, treat it as a regular string
+                        Cell cell = row.createCell(cellNumber++);
+                        cell.setCellValue(value);
+                    }
+                }
+            }
+        }
+
+        // Write the Excel data to the output file
+        try (FileWriter fileWriter = new FileWriter(xlsxFilePath)) {
+            workbook.write(fileWriter);
+        }
+
+        workbook.close();
+    }
+}
+
+
+
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
