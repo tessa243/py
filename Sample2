@@ -1,3 +1,49 @@
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class ExcelCellReplacement {
+
+    public static void main(String[] args) {
+        String filePath = "path/to/your/excel/file.xlsx";
+        String sheetName = "Sheet1"; // Replace with your sheet name
+        int rowNumber = 2; // Row number (0-indexed)
+        int columnNumber = 3; // Column number (0-indexed)
+        String newValue = "New Value"; // Replace with the value you want to set
+
+        try (FileInputStream fileInputStream = new FileInputStream(filePath);
+             Workbook workbook = new XSSFWorkbook(fileInputStream)) {
+
+            Sheet sheet = workbook.getSheet(sheetName);
+            if (sheet != null) {
+                Row row = sheet.getRow(rowNumber);
+                if (row != null) {
+                    Cell cell = row.getCell(columnNumber, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellValue(newValue);
+                } else {
+                    System.out.println("Row not found!");
+                }
+            } else {
+                System.out.println("Sheet not found!");
+            }
+
+            // Write the changes back to the file
+            try (FileOutputStream fileOutputStream = new FileOutputStream(filePath)) {
+                workbook.write(fileOutputStream);
+            }
+
+            System.out.println("Cell updated successfully.");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
