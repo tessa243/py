@@ -1,3 +1,58 @@
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class ClearAndReenterDateTimeInBColumn {
+    public static void main(String[] args) {
+        String filePath = "path/to/your/excel/file.xlsx";
+
+        try (FileInputStream fis = new FileInputStream(filePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0); // Assuming you want to work with the first sheet
+
+            // Get the column index for column B (B is the second column, so index 1 - zero-indexed)
+            int columnIndexB = 1;
+
+            // Format for the date "M/d/yyyy h:mm a"
+            SimpleDateFormat dateFormat = new SimpleDateFormat("M/d/yyyy h:mm a");
+
+            // Loop through the rows in column B, clear the contents, and re-enter with the desired format
+            for (Row row : sheet) {
+                Cell cell = row.getCell(columnIndexB);
+                if (cell != null) {
+                    String existingValue = cell.getStringCellValue();
+                    if (!existingValue.isEmpty()) {
+                        Date dateValue = new SimpleDateFormat("M/d/yyyy h:mm a").parse(existingValue);
+
+                        // Set the cell format to display as "M/d/yyyy h:mm a"
+                        CellStyle cellStyle = workbook.createCellStyle();
+                        cellStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat("M/d/yyyy h:mm a"));
+                        cell.setCellValue(dateValue);
+                        cell.setCellStyle(cellStyle);
+                    }
+                }
+            }
+
+            // Save the changes back to the file
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                workbook.write(fos);
+            }
+
+            System.out.println("Contents cleared and re-entered with format M/d/yyyy h:mm a in the B column successfully!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import org.apache.poi.ss.usermodel.*;
