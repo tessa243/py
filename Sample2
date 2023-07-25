@@ -1,3 +1,54 @@
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import org.apache.poi.ss.usermodel.*;
+
+public class ExcelProcessor {
+
+    public static void main(String[] args) {
+        String filePath = "path/to/your/excel_file.xlsx";
+        removeAndReenterColumnBValues(filePath);
+    }
+
+    public static void removeAndReenterColumnBValues(String filePath) {
+        try {
+            FileInputStream file = new FileInputStream(filePath);
+            Workbook workbook = WorkbookFactory.create(file);
+            Sheet sheet = workbook.getSheetAt(0);
+
+            // Get the column B index (column index is 1-based)
+            int columnIndexB = 1;
+
+            // Iterate through all rows in column B
+            for (Row row : sheet) {
+                Cell cell = row.getCell(columnIndexB);
+                if (cell != null) {
+                    // Retrieve the value in column B
+                    String cellValue = cell.getStringCellValue();
+                    
+                    // Clear the cell value in column B
+                    cell.setCellValue("");
+
+                    // Re-enter the same value in column B
+                    Cell newCell = row.createCell(columnIndexB);
+                    newCell.setCellValue(cellValue);
+                }
+            }
+
+            // Write changes back to the Excel file
+            FileOutputStream fileOut = new FileOutputStream(filePath);
+            workbook.write(fileOut);
+            fileOut.close();
+            workbook.close();
+
+            System.out.println("All values in column B of '" + filePath + "' have been removed and re-entered successfully.");
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+}
+
+
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
