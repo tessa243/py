@@ -4,6 +4,92 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class FormatDateTimeInBColumn {
+    public static void main(String[] args) {
+        String filePath = "path/to/your/excel/file.xlsx";
+
+        try (FileInputStream fis = new FileInputStream(filePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0); // Assuming you want to work with the first sheet
+
+            // Get the column index for column B (B is the second column, so index 1 - zero-indexed)
+            int columnIndexB = 1;
+
+            // Format for the date "M/d/yyyy h:mm a"
+            SimpleDateFormat dateFormat = new SimpleDateFormat("M/d/yyyy h:mm a");
+
+            // Loop through the rows in column B, starting from the second row (exclude B1), and set the cell format
+            int startRow = 1; // Exclude the first row (B1)
+            int lastRow = sheet.getLastRowNum();
+
+            for (int rowNum = startRow; rowNum <= lastRow; rowNum++) {
+                Row row = sheet.getRow(rowNum);
+                if (row == null) {
+                    continue; // Skip empty rows
+                }
+
+                Cell cell = row.getCell(columnIndexB);
+                if (cell != null) {
+                    CellType cellType = cell.getCellType();
+                    if (cellType == CellType.STRING) {
+                        String existingValue = cell.getStringCellValue();
+                        if (!existingValue.isEmpty()) {
+                            Date dateValue = parseDate(existingValue);
+                            if (dateValue != null) {
+                                cell.setCellValue(dateValue);
+                            }
+                            // Set the cell format to display as "M/d/yyyy h:mm a"
+                            CellStyle cellStyle = workbook.createCellStyle();
+                            cellStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat("M/d/yyyy h:mm a"));
+                            cell.setCellStyle(cellStyle);
+                        }
+                    }
+                }
+            }
+
+            // Save the changes back to the file
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                workbook.write(fos);
+            }
+
+            System.out.println("Date and time in the B column formatted successfully to M/d/yyyy h:mm a!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static Date parseDate(String dateStr) {
+        SimpleDateFormat[] dateFormats = {
+                new SimpleDateFormat("M/d/yyyy h:mm a"),
+                new SimpleDateFormat("M/d/yyyy H:mm"),
+                // Add more formats as needed in the above array
+        };
+
+        for (SimpleDateFormat dateFormat : dateFormats) {
+            try {
+                return dateFormat.parse(dateStr);
+            } catch (ParseException e) {
+                // Ignore the exception and try the next format
+            }
+        }
+
+        // If no valid format matches, return null
+        return null;
+    }
+}
+
+
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
