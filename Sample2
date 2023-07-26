@@ -1,3 +1,35 @@
+public class Main {
+    private static final String DRIVER_LOCATION = getDriverLocation();
+
+    public static void main(String[] args) {
+        System.setProperty("webdriver.chrome.driver", DRIVER_LOCATION);
+        // Rest of your code...
+    }
+
+    private static String getDriverLocation() {
+        String resourceName = "dev/chromedriver.exe";
+        String driverLocation;
+
+        // Get the class loader
+        ClassLoader classLoader = Main.class.getClassLoader();
+
+        // Get the resource URL
+        URL resourceUrl = classLoader.getResource(resourceName);
+        if (resourceUrl != null) {
+            // Extract the path from the URL
+            driverLocation = resourceUrl.getPath();
+        } else {
+            // If resource not found, fall back to a relative path from the current working directory
+            String userDir = System.getProperty("user.dir");
+            driverLocation = userDir + "/src/main/resources/dev/chromedriver.exe";
+        }
+
+        return driverLocation;
+    }
+}
+
+
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
