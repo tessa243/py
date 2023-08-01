@@ -1,0 +1,26 @@
+I hope this email finds you well. I am excited to share the progress and outcomes of our "Automated Incident Analysis" project.
+In the current scenario, we faced challenges with manual data extraction from Tableau Server and the time-consuming process 
+of generating summary reports for analysis. However, I am pleased to inform you that we have successfully 
+implemented an automated approach to streamline this process.
+
+Overview:
+With the automated approach, we now extract incident data from Tableau Server
+and generate a pivot table representation in an Excel sheet using Selenium in Java. 
+This eliminates the need for manual intervention, significantly reducing the time required for data analysis.
+
+Data Extraction and Conversion:
+The incident details workbook, which updates daily,
+contains approximately 3900 rows and 145 columns of data. However, for our analysis purpose,
+we focus only on four relevant columns: INCIDENT NUMBER, OPENED DATE, DESCRIPTION, and SHORT DESCRIPTION. 
+We have automated the data extraction process using the Apache POI dependency in Java and converted the downloaded CSV file to an
+XLSX file for better data manipulation.
+
+Categorization:
+To further enhance the analysis, we have introduced a "category" column based on the "SHORT DESCRIPTION."
+ By identifying important terms such as "Wiley Alert," "Threshold," "Job Failure,"
+"Job Termination," "Max Retry," and "Max Run Alarm," we categorize incidents accordingly. 
+Any incidents that do not fall under these categories are labeled as "Others." This categorization 
+simplifies the identification of trends and patterns in the data.
+
+Summary Report:
+The generated pivot table in the Excel sheet provides insightful month-wise incident counts for each category, aiding in better decision-making and analysis. This categorized sheet serves as an informative summary report that can be used for further analysis and shared with relevant stakeholders.
